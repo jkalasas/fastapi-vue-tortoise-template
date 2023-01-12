@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "Template API"
+version = "0.1.0"
+description = ""
+authors = ["jkalasas <alasasjohnkyle@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+fastapi = "^0.89.1"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
