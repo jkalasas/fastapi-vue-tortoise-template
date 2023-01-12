@@ -14,6 +14,10 @@ load_dotenv()
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
+class DBSettings(BaseSettings):
+    DATABASE_URI: str = "sqlite://example.db"
+
+
 class LoggingSettings(BaseSettings):
     LOGGING_LEVEL: int = logging.INFO
 
@@ -37,6 +41,7 @@ class Settings(BaseSettings):
     ]
     BACKEND_CORS_ORIGIN_REGEX: Optional[str] = "https.*\.(netlify.app|herokuapp.com)"
 
+    db = DBSettings()
     logging = LoggingSettings()
 
     @validator("BACKEND_CORS_ORIGINS")

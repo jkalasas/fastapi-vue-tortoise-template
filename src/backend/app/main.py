@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from tortoise.contrib.fastapi import HTTPNotFoundError, register_tortoise
 
 from app.core.config import settings, setup_app_logging
 
@@ -15,6 +16,14 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+register_tortoise(
+    app,
+    db_url=settings.db.DATABASE_URI,
+    modules={"models": []},
+    generate_schemas=True,
+    add_exception_handlers=True,
+)
 
 
 @app.get("/")
