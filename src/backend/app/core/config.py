@@ -1,6 +1,13 @@
+import pathlib
 from typing import List, Optional, Union
 
+from dotenv import load_dotenv
+
 from pydantic import BaseSettings, validator
+
+load_dotenv()
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
