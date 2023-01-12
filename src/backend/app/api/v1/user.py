@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.core.security import get_password_hash
 from app.models.user import User
 from app.schemas.user import UserCreate, UserDB
+from app.api.deps.auth import get_current_user
 
 router = APIRouter()
 
@@ -15,4 +16,9 @@ async def register_user(user_in: UserCreate):
 
     await user.save()
 
+    return user
+
+
+@router.get("/me", response_model=UserDB)
+async def get_current_user(user: User = Depends(get_current_user)):
     return user
