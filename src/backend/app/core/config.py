@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     ]
     BACKEND_CORS_ORIGIN_REGEX: Optional[str] = "https.*\.(netlify.app|herokuapp.com)"
 
+    AUTH_ROUTE: str = "/api/v1/token/new"
+    JWT_SECRET: str = "PLEASE_CHANGE_THIS"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+
     db = DBSettings()
     logging = LoggingSettings()
 
