@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 
+from app.api.v1 import user
 from app.core.config import settings, setup_app_logging
 
 setup_app_logging(settings)
@@ -30,6 +31,4 @@ register_tortoise(
 )
 
 
-@app.get("/")
-def index():
-    return {"hello": "world"}
+app.include_router(user.router, prefix=f"{settings.API_V1_STR}/user", tags=["User"])
