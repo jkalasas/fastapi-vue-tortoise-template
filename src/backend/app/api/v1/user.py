@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
+from tortoise.exceptions import ValidationError
 
 from app.core.security import get_password_hash
 from app.models.user import User
@@ -10,9 +11,16 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserDB)
 async def register_user(user_in: UserCreate):
-    user = await User(
-        username=user_in.username, password=get_password_hash(user_in.password)
-    )
+    try:
+        user = await User(
+            username=user_in.username,
+            password=get_password_hash(user_in.password),
+        )
+    except ValidationError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid credentials values",
+        )
 
     await user.save()
 
