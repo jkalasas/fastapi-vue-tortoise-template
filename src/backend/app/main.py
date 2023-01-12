@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
+from app.core.config import settings, setup_app_logging
 
+setup_app_logging(settings)
 app = FastAPI(title="Template API")
 
 if settings.BACKEND_CORS_ORIGINS:

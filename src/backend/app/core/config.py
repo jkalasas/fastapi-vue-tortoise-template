@@ -1,13 +1,27 @@
+import logging
 import pathlib
+import sys
 from typing import List, Optional, Union
 
 from dotenv import load_dotenv
-
+from loguru import logger
 from pydantic import BaseSettings, validator
+
+from app.core.logging import InterceptHandler
 
 load_dotenv()
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+
+class LoggingSettings(BaseSettings):
+    LOGGING_LEVEL: int = logging.INFO
+
+    USE_LOG_FILE: bool = False
+    LOG_FILE_PATH: str = str(ROOT.parent)
+    LOG_FILE_FORMAT: str = "app-{time}.log"
+    ROTATION_TIME: str = "1 week"
+    RETENTION_TIME: str = "1 month"
 
 
 class Settings(BaseSettings):
@@ -23,6 +37,8 @@ class Settings(BaseSettings):
     ]
     BACKEND_CORS_ORIGIN_REGEX: Optional[str] = "https.*\.(netlify.app|herokuapp.com)"
 
+    logging = LoggingSettings()
+
     @validator("BACKEND_CORS_ORIGINS")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
@@ -35,6 +51,25 @@ class Settings(BaseSettings):
         case_sensitive = True
         env_file = ".env"
         env_file_encoding = "utf-8"
+
+
+def setup_app_logging(config: Settings) -> None:
+    """Prepare custom logging for our application."""
+    LOGGERS = ("uvicorn.asgi", "uvicorn.access")
+    logging.getLogger().handlers = [InterceptHandler()]
+    for logger_name in LOGGERS:
+        logging_logger = logging.getLogger(logger_name)
+        logging_logger.handlers = [InterceptHandler(level=config.logging.LOGGING_LEVEL)]
+
+    logger.configure(
+        handlers=[{"sink": sys.stderr, "level": config.logging.LOGGING_LEVEL}]
+    )
+    if config.logging.USE_LOG_FILE:
+        logger.add(
+            f"{config.logging.LOG_FILE_PATH}/{config.logging.LOG_FILE_FORMAT}",
+            rotation=config.logging.ROTATION_TIME,
+            retention=config.logging.RETENTION_TIME,
+        )
 
 
 settings = Settings()
